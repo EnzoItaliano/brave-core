@@ -22,6 +22,7 @@ class SharedURLLoaderFactory;
 namespace brave {
 
 class BraveOperationalPatterns;
+class BraveFederatedDataService;
 
 class BraveFederatedLearningService final {
  public:
@@ -47,6 +48,7 @@ class BraveFederatedLearningService final {
   PrefService* local_state_;
   PrefChangeRegistrar local_state_change_registrar_;
   std::unique_ptr<BraveOperationalPatterns> operational_patterns_;
+  std::unique_ptr<BraveFederatedDataService> data_service_;
   scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
 };
 

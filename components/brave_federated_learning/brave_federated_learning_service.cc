@@ -3,12 +3,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include <string>
-
 #include "brave/components/brave_federated_learning/brave_federated_learning_service.h"
 
+#include <map>
+#include <string>
+
+#include "base/files/scoped_temp_dir.h"
+#include "base/json/json_reader.h"
+#include "base/path_service.h"
+#include "brave/components/brave_federated_learning/brave_federated_data_service.h"
 #include "brave/components/brave_federated_learning/brave_operational_patterns.h"
 #include "brave/components/brave_federated_learning/brave_operational_patterns_features.h"
+#include "brave/components/brave_federated_learning/data_stores/data_store.h"
 #include "brave/components/p3a/pref_names.h"
 #include "components/prefs/pref_change_registrar.h"
 #include "components/prefs/pref_registry_simple.h"
@@ -34,6 +40,16 @@ void BraveFederatedLearningService::Start() {
       new BraveOperationalPatterns(local_state_, url_loader_factory_));
 
   InitPrefChangeRegistrar();
+
+  base::ScopedTempDir temp_dir;
+  if (!temp_dir.CreateUniqueTempDir()) {
+    return;
+  }
+  base::FilePath db_path(
+      temp_dir.GetPath().AppendASCII("federated_data_store.db"));
+
+  data_service_.reset(new BraveFederatedDataService(db_path));
+  data_service_->Init();
 
   if (IsP3AEnabled() && IsOperationalPatternsEnabled()) {
     operational_patterns_->Start();

@@ -1,5 +1,5 @@
 import { EthereumSignedTx } from 'trezor-connect/lib/typescript'
-import { HardwareVendor } from '../api/getKeyringsByType'
+import { HardwareVendor, SupportedCoins } from '../api/getKeyringsByType'
 
 export type HardwareWalletResponseCodeType =
   | 'deviceNotConnected'
@@ -46,6 +46,7 @@ export interface HardwareWalletAccount {
   name: string
   hardwareVendor: HardwareVendor
   deviceId: string
+  coin: SupportedCoins
 }
 
 export enum LedgerDerivationPaths {

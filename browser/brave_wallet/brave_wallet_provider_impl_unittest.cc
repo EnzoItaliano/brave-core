@@ -43,6 +43,7 @@
 #include "chrome/test/base/testing_profile.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/grit/brave_components_strings.h"
+#include "components/permissions/permission_request_manager.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/user_prefs/user_prefs.h"
@@ -149,6 +150,7 @@ class BraveWalletProviderImplUnitTest : public testing::Test {
   void SetUp() override {
     web_contents_ =
         content::TestWebContents::Create(browser_context(), nullptr);
+    permissions::PermissionRequestManager::CreateForWebContents(web_contents());
     eth_json_rpc_controller_.reset(
         new EthJsonRpcController(shared_url_loader_factory_, prefs()));
     SetNetwork("0x1");

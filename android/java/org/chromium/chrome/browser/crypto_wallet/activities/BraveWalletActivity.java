@@ -34,6 +34,7 @@ import org.chromium.brave_wallet.mojom.ErcTokenRegistry;
 import org.chromium.brave_wallet.mojom.EthJsonRpcController;
 import org.chromium.brave_wallet.mojom.EthTxController;
 import org.chromium.brave_wallet.mojom.KeyringController;
+import org.chromium.brave_wallet.mojom.KeyringControllerObserver;
 import org.chromium.brave_wallet.mojom.TransactionInfo;
 import org.chromium.brave_wallet.mojom.TransactionStatus;
 import org.chromium.chrome.R;
@@ -54,6 +55,7 @@ import org.chromium.chrome.browser.crypto_wallet.fragments.onboarding_fragments.
 import org.chromium.chrome.browser.crypto_wallet.fragments.onboarding_fragments.UnlockWalletFragment;
 import org.chromium.chrome.browser.crypto_wallet.fragments.onboarding_fragments.VerifyRecoveryPhraseFragment;
 import org.chromium.chrome.browser.crypto_wallet.listeners.OnNextPage;
+import org.chromium.chrome.browser.crypto_wallet.observers.KeyringControllerObserverImpl;
 import org.chromium.chrome.browser.crypto_wallet.util.NavigationItem;
 import org.chromium.chrome.browser.crypto_wallet.util.Utils;
 import org.chromium.chrome.browser.init.AsyncInitializationActivity;
@@ -73,7 +75,8 @@ public class BraveWalletActivity
         extends AsyncInitializationActivity implements OnNextPage, ConnectionErrorHandler {
     private Toolbar mToolbar;
 
-    private View cryptoLayout;
+    private View mCryptoLayout;
+    private View mCryptoOnboardingLayout;
     private View cryptoOnboardingLayout;
     private ImageView swapButton;
     private ViewPager cryptoWalletOnboardingViewPager;
@@ -85,6 +88,7 @@ public class BraveWalletActivity
     private EthTxController mEthTxController;
     private AssetRatioController mAssetRatioController;
     private BraveWalletService mBraveWalletService;
+    private KeyringControllerObserver mKeyringControllerObserver;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -137,7 +141,8 @@ public class BraveWalletActivity
                     getSupportFragmentManager(), SwapBottomSheetDialogFragment.TAG_FRAGMENT);
         });
 
-        cryptoLayout = findViewById(R.id.crypto_layout);
+        mCryptoLayout = findViewById(R.id.crypto_layout);
+        mCryptoOnboardingLayout = findViewById(R.id.crypto_onboarding_layout);
         cryptoWalletOnboardingViewPager = findViewById(R.id.crypto_wallet_onboarding_viewpager);
         cryptoWalletOnboardingPagerAdapter =
                 new CryptoWalletOnboardingPagerAdapter(getSupportFragmentManager());
@@ -224,6 +229,8 @@ public class BraveWalletActivity
         }
 
         mKeyringController = KeyringControllerFactory.getInstance().getKeyringController(this);
+        mKeyringControllerObserver = new KeyringControllerObserverImpl(this);
+        mKeyringController.addObserver(mKeyringControllerObserver);
     }
 
     private void InitErcTokenRegistry() {
@@ -335,7 +342,8 @@ public class BraveWalletActivity
 
     private void setNavigationFragments(int type) {
         List<NavigationItem> navigationItems = new ArrayList<>();
-        cryptoLayout.setVisibility(View.GONE);
+        mCryptoLayout.setVisibility(View.GONE);
+        mCryptoOnboardingLayout.setVisibility(View.VISIBLE);
         if (type == ONBOARDING_FIRST_PAGE_ACTION) {
             SetupWalletFragment setupWalletFragment = new SetupWalletFragment();
             setupWalletFragment.setOnNextPageListener(this);
@@ -392,9 +400,8 @@ public class BraveWalletActivity
     }
 
     private void setCryptoLayout() {
-        cryptoOnboardingLayout = findViewById(R.id.crypto_onboarding_layout);
-        cryptoOnboardingLayout.setVisibility(View.GONE);
-        cryptoLayout.setVisibility(View.VISIBLE);
+        mCryptoOnboardingLayout.setVisibility(View.GONE);
+        mCryptoLayout.setVisibility(View.VISIBLE);
 
         ViewPager viewPager = findViewById(R.id.navigation_view_pager);
         CryptoFragmentPageAdapter adapter =
@@ -434,8 +441,8 @@ public class BraveWalletActivity
     }
 
     public void backupBannerOnClick() {
-        cryptoOnboardingLayout.setVisibility(View.VISIBLE);
-        cryptoLayout.setVisibility(View.GONE);
+        mCryptoOnboardingLayout.setVisibility(View.VISIBLE);
+        mCryptoLayout.setVisibility(View.GONE);
 
         List<NavigationItem> navigationItems = new ArrayList<>();
         addBackupWalletSequence(navigationItems);
@@ -484,5 +491,9 @@ public class BraveWalletActivity
     @Override
     public void gotoRestorePage() {
         replaceNavigationFragments(RESTORE_WALLET_ACTION, true);
+    }
+
+    public void lockWallet() {
+        setNavigationFragments(UNLOCK_WALLET_ACTION);
     }
 }

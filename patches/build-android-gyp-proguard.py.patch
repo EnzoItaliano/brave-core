@@ -1,5 +1,5 @@
 diff --git a/build/android/gyp/proguard.py b/build/android/gyp/proguard.py
-index 2621ce6f77662b310388cacee3ef938cb20020f8..b8f24b9e10864c153df511171472d48c2e3b4e9b 100755
+index 2a857409b733d039b4f7f33ccfce6f327abc0d7e..ca8103136002044bed5a6d26683e76c186a8123d 100755
 --- a/build/android/gyp/proguard.py
 +++ b/build/android/gyp/proguard.py
 @@ -496,6 +496,7 @@ def _CheckForMissingSymbols(r8_path, dex_files, classpath, warnings_as_errors,

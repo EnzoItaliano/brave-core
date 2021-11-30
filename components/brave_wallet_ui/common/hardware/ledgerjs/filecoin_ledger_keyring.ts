@@ -40,7 +40,7 @@ export default class FileCoinLedgerKeyring extends LedgerKeyring {
     }
     from = (from < 0) ? 0 : from
     const app: LedgerProvider = this.provider
-    const accounts = await app.getAccounts(from, to, CoinType.MAIN)
+    const accounts = await app.getAccounts(from, to, CoinType.TEST)
     const result = []
     for (let i = 0; i < accounts.length; i++) {
       result.push({
